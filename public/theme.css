@@ -2,15 +2,19 @@
 
 :root {
     --accent: #fac425;
+    --accent-alt: #ee9a1d;
     --background: #1d191f;
     --background-alt: #151216;
     --text: #e8e4f7;
 }
 
 * {
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+
+  text-decoration: none;
+  font-family: 'Outfit';
 }
 
 html, body {
@@ -57,7 +61,7 @@ html, body {
   padding-right: 20%;
 }
 
-a, .a {
+.a {
   background: none;
   border: none;
   outline: none;
@@ -74,16 +78,17 @@ a, .a {
   transition: 0.2s;
 }
 
-a:hover, .a:hover {
+.a:hover {
   color:var(--accent);
 }
 
-.button {
+.button, .button-alt {
+  text-decoration: none;
   padding: 8px;
   padding-left: 64px;
   padding-right: 64px;
   background-color: var(--background);
-  border: 2px solid var(--background-alt);
+  border: 4px solid var(--background-alt);
 
   border-radius: 16px;
 
@@ -96,8 +101,14 @@ a:hover, .a:hover {
   transition: 0.2s;
 }
 
-button:hover {
+.button-alt {
+  background-color: var(--background-alt);
+  border-color: var(--background);
+}
+
+.button:hover, .button-alt:hover {
   border-color: var(--accent);
+  color: var(--text);
 }
 
 .container {
@@ -134,7 +145,7 @@ button:hover {
   padding: 16px;
 }
 
-h1, p {
+h1, h2, p {
   text-align: center;
   margin-bottom: 16px;
 }
@@ -169,6 +180,101 @@ input {
   font-size: large;
   font-family: 'Outfit';
   color: var(--text);
+}
+
+.lista-salas {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  justify-self: center;
+
+  margin: 16px;
+  padding: 32px;
+  border-radius: 8px;
+
+  background-color: var(--background-alt);
+  border: 4px solid var(--background);
+
+  min-width: calc(640px + 64px);
+
+  gap: 32px;
+}
+
+.card-sala {
+  position: relative;
+  
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 0;
+
+  background-color: var(--background);
+
+  overflow: hidden;
+
+  width: 640px;
+  height: 64px;
+  border-radius: 8px;
+
+  background-size: cover;
+  background-position: center;
+
+  transition: 0.2s;
+}
+
+.jogadores-sala {
+  display: flex;
+  padding: 8px;
+  text-align: center;
+
+  padding-top: 20px;
+  justify-content: center;
+  align-content: center;
+
+  width: 96px;
+  height: 64px;
+  gap: 4px;
+
+  border-bottom-left-radius: 8px;
+
+  background-color: var(--accent);
+  color: black;
+
+  font-size: medium;
+  font-weight: bold;
+}
+
+.id-sala {
+  display: flex;
+  padding: 8px;
+  text-align: center;
+
+  padding-top: 20px;
+  justify-content: center;
+  align-content: center;
+
+  width: 96px;
+  height: 64px;
+  gap: 4px;
+
+  border-bottom-right-radius: 8px;
+
+  background-color: var(--accent);
+  color: black;
+
+  font-size: medium;
+  font-weight: bold;
+}
+
+.lista-jogadores {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
 }
 
 .material-symbols-outlined {

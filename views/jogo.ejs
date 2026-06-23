@@ -4,6 +4,11 @@
 <div class="container" style="flex-direction: row; gap: 32px;">
   <div class="container-inner" style="min-width: 360px;">
     <h2>Jogadores</h2>
+    <div class="container-inner lista-jogadores">
+      <% sala.jogadores.forEach(function(jogador) { %>
+        <span class=""><%= jogador %></span>
+      <% }); %>
+    </div>
   </div>
   <div class="container-inner">
     <h2>Rodada Atual - Letra: <span id="letra-atual" class="text-primary">?</span></h2>

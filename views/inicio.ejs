@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <h1>Salas</h1>
+    <div id="lista-salas" class="lista-salas">
+        <% const idsSalas = Object.keys(salas); %>
+        <% if(idsSalas.length > 0) { %>
+            <% idsSalas.forEach(function(id) { %>
+                <% const sala = salas[id]; %>
+                <div class="card-sala">
+                    <span class="id-sala">#<%= sala.id %></span>
+                    <a class="button" href="/jogo/<%= sala.id %>">entrar</a>
+                    <span class="jogadores-sala"> <%= sala.jogadores.length %> <span class="material-symbols-outlined">person</span></span>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <span>nenhuma sala encontrada</span>
+        <% }%>
+        <a class="button-alt" href="/criar-sala">criar sala</a>
+    </div>
+</div>
+
+<script>
+const listaSalas = document.getElementById("lista-salas");
+const criarSala = document.getElementById("criar-sala");
+</script>
+
+<%- include('partials/footer') %>

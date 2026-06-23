@@ -21,6 +21,8 @@ app.use(session({
 
 app.get('/login', (req, res) => res.render('login'));
 
+app.get('/', (req, res) => res.render('inicio', { salas : salas }));
+
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ where: { username } });
@@ -31,7 +33,7 @@ app.post('/login', async (req, res) => {
     if (isValid) {
       req.session.userId = user.id;
       req.session.username = user.username;
-      return res.redirect('/lobby');
+      return res.redirect('/');
     }
   }
   res.send('Usuário ou senha inválidos');
@@ -56,6 +58,18 @@ app.post('/cadastro', async (req, res) => {
   }
 });
 
+app.get('/criar-sala', (req, res) => {
+  const idSala = Math.random().toString(36).substring(2, 8);
+  
+  salas[idSala] = {
+    id: idSala,
+    jogadores: ["pedro", "ana", "gabriel", "maria", "carlos", "sofia"]
+  };
+
+  console.log("sala criada com id: " + idSala)
+  res.redirect('/jogo/' + idSala);
+});
+
 function requireAuth(req, res, next) {
     if(req.session.userId) next();
     else res.redirect('/login');
@@ -65,10 +79,10 @@ app.get('/lobby', requireAuth, (req, res) => {
   res.render('lobby', { username: req.session.username });
 });
 
-app.get('/jogo', requireAuth, (req, res) => {
-  const sala = req.query.sala;
-  if(sala in Object.keys(salas)) {
-    res.render('jogo', { username: req.session.username, sala });
+app.get('/jogo/:id', requireAuth, (req, res) => {
+  const sala = req.params.id;
+  if(salas[sala]) {
+    res.render('jogo', { username: req.session.username, sala : salas[sala] });
   } else res.status(404).send("Sala não encontrada");
 });
 
