@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+
+<div class="container" style="width: 50%;">
+    <form id="formulario-login" method="post" action="/login" class="container-inner">
+        <h1>Acessar</h1>
+        <label>
+            usuário
+            <input id="username" name="username" type="text">
+        </label>
+        <label>
+            senha
+            <input id="password" name="password" type="text">
+        </label>
+        <div style="padding-top: 16px; gap: 32px; display: flex; flex-direction: row; justify-content: center; align-items: center">
+            <button class="button" type="submit">login</button>
+            <button class="a" type="button" onclick="trocarFormulario()">não tenho uma conta</button>
+        </div>
+    </form>
+    <form id="formulario-sigin" method="post" action="/cadastro" class="container-inner">
+        <h1>Cadastrar</h1>
+        <label>
+            usuário
+            <input id="username" name="username" type="text">
+        </label>
+        <label>
+            senha
+            <input id="password" name="password" type="text">
+        </label>
+        <div style="padding-top: 16px; gap: 32px; display: flex; flex-direction: row; justify-content: center; align-items: center">
+            <button class="button" type="submit">criar conta</button>
+            <button class="a" type="button" onclick="trocarFormulario()">já tenho uma conta</button>
+        </div>
+    </form>
+</div>
+
+<script>
+const formLogin = document.getElementById("formulario-login");
+const formSigin = document.getElementById("formulario-sigin");
+formSigin.style.display = "none";
+
+estado = "login";
+function trocarFormulario() {
+    if(estado === "login") {
+        estado = "cadastro";
+        formLogin.style.display = "none";
+        formSigin.style.display = "flex";
+    } else {
+        estado = "login";
+        formSigin.style.display = "none";
+        formLogin.style.display = "flex";
+    }
+}
+</script>
+
+<%- include('partials/footer') %>
