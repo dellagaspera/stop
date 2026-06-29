@@ -7,34 +7,38 @@
     <div id="lista-jogadores" class="container-inner lista-jogadores">
     </div>
   </div>
-  <div class="container-inner">
+  <div id="container-jogo" class="container-inner">
     <h2>Rodada Atual - Letra: <span id="letra-atual" class="text-primary">?</span></h2>
     
     <form id="form-stop">
       <label>Nome  
-        <input type="text" class="form-control categoria" id="cat-nome" disabled>
+        <input type="text" class="categoria" id="categoria-nome" disabled>
       </label>
       <label>Cor  
-        <input type="text" class="form-control categoria" id="cat-cor" disabled>
+        <input type="text" class="categoria" id="categoria-cor" disabled>
       </label>
       <label>Animal  
-        <input type="text" class="form-control categoria" id="cat-animal" disabled>
+        <input type="text" class="categoria" id="categoria-animal" disabled>
+      </label>
+      <label>Time de futebol  
+        <input type="text" class="categoria" id="categoria-time" disabled>
+      </label>
+      <label>CEP  
+        <input type="text" class="categoria" id="categoria-cep" disabled>
       </label>
       
-      <button type="button" id="btn-stop" class="button" disabled>STOP!</button>
+      <button type="button" id="botao-stop" class="button" disabled>STOP!</button>
     </form>
   </div>
 
-  <div class="container-inner" style="min-width: 360px;">
-  <div class="container-inner chat" style="min-width: 360px;">
+  <div id="container-chat" class="container-inner" style="min-width: 360px;">
     <h2>Chat</h2>
-    <div id="chat">
+    <div class="container-inner chat">
+      <div id="chat">
+      </div>
+      
     </div>
-    
-    <form id="form-chat">
-      <input type="text">
-    </form>
-  </div>
+    <input class="input-chat" id="input-chat" type="text" placeholder="digite sua mensagem...">
   </div>
 
   <script>
@@ -49,6 +53,17 @@
     let dono;
     
     const chat = document.getElementById("chat");
+    setTimeout(() => {document.getElementById("container-chat").style.height = `${document.getElementById("container-jogo").offsetHeight}px`;}, 500)
+    const inputChat = document.getElementById("input-chat");
+
+    inputChat.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      if(event.target.value === "") return;
+      console.log("mensagem: " + event.target.value);
+      socket.emit('enviar_mensagem', { quemMandou : username, mensagem : event.target.value, sala: sala.id });
+      event.target.value = '';
+    }
+});
 
     // Entra na sala
     socket.emit('entrar_sala', { sala : "<%= sala.id %>", username });
@@ -107,7 +122,7 @@
     });
 
     // Ao clicar em STOP
-    document.getElementById('btn-stop').addEventListener('click', () => {
+    document.getElementById('botao-stop').addEventListener('click', () => {
       socket.emit('gritar_stop', { salaId, username });
     });
 
@@ -125,11 +140,19 @@
       console.log("recebi mensagem: \n" + `${quemMandou}: ${mensagem}`);
 
       let divMensagem = document.createElement("div");
+      divMensagem.classList.add("mensagem-chat");
 
       let spanPessoa= document.createElement("span")
       spanPessoa.textContent = quemMandou;
+      spanPessoa.classList.add("quem-mandou");
       let spanMensagem= document.createElement("span")
+      spanMensagem.classList.add("conteudo");
       spanMensagem.textContent = mensagem;
+
+      if(quemMandou === "Servidor") {
+        spanPessoa.classList.add("servidor");
+        spanMensagem.classList.add("servidor");
+      }
 
       divMensagem.appendChild(spanPessoa);
       divMensagem.appendChild(spanMensagem);

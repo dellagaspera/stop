@@ -123,7 +123,6 @@ io.on('connection', (socket) => {
 
     if (Object.keys(salas[sala].jogadores).length === 0) {
       salas[sala].dono = username;
-      console.log("Novo dono da sala:", salas[sala].dono);
     }
     
     salas[sala].jogadores[username] = socket.id;
@@ -132,6 +131,15 @@ io.on('connection', (socket) => {
     
     io.to(sala).emit('atualizar_sala', salas[sala]);
     io.emit('atualizar-lista-salas', salas);
+  });
+
+  socket.on('enviar_mensagem', (dados) => {
+    const sala = dados.sala;
+    const quemMandou = dados.quemMandou;
+    const mensagem = dados.mensagem;
+
+    console.log(`${quemMandou} disse "${mensagem}" para a sala ${sala}`);
+    io.to(sala).emit('mensagem_recebida', { quemMandou, mensagem });
   });
 
   socket.on('disconnect', () => {
