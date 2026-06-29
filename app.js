@@ -19,6 +19,11 @@ app.use(session({
   saveUninitialized: false
 }));
 
+app.use((req, res, next) => {
+  res.locals.username = req.session.username || null;
+  next();
+});
+
 app.get('/login', (req, res) => res.render('login'));
 
 app.get('/', (req, res) => res.render('inicio', { salas : salas }));
@@ -39,6 +44,18 @@ app.post('/login', async (req, res) => {
   res.send('Usuário ou senha inválidos');
 });
 
+app.get('/logout', async (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
+
+// (err) => {
+//     if (err) {
+//       console.error("Erro ao fazer logout:", err);
+//     }
+    
+//   }
+
 app.post('/cadastro', async (req, res) => {
   const { username, password } = req.body;
   let user = await User.findOne({ where: { username } });
@@ -54,18 +71,19 @@ app.post('/cadastro', async (req, res) => {
     user = await User.findOne({ where: { username } });
     req.session.userId = user.id;
     req.session.username = user.username;
-    return res.redirect('/lobby');
+    return res.redirect('/');
   }
 });
 
-app.get('/criar-sala', (req, res) => {
+app.get('/criar-sala', requireAuth, (req, res) => {
   const idSala = Math.random().toString(36).substring(2, 8);
   
   salas[idSala] = {
     id: idSala,
-    jogadores: ["pedro", "ana", "gabriel", "maria", "carlos", "sofia"]
+    jogadores: {}
   };
 
+  io.emit('atualizar-lista-salas', salas);
   console.log("sala criada com id: " + idSala)
   res.redirect('/jogo/' + idSala);
 });
@@ -75,43 +93,87 @@ function requireAuth(req, res, next) {
     else res.redirect('/login');
 }
 
-app.get('/lobby', requireAuth, (req, res) => {
-  res.render('lobby', { username: req.session.username });
-});
-
 app.get('/jogo/:id', requireAuth, (req, res) => {
   const sala = req.params.id;
-  if(salas[sala]) {
-    res.render('jogo', { username: req.session.username, sala : salas[sala] });
-  } else res.status(404).send("Sala não encontrada");
+  
+  res.render('jogo', { username: req.session.username, sala : salas[sala] });
 });
-
 let salas = {}
 
 io.on('connection', (socket) => {
   console.log('Novo jogador conectado:', socket.id);
 
+  socket.on('solicitar-lista-salas', () => {
+    console.log("me pediram pra atualizar a lista");
+    socket.emit('atualizar-lista-salas', salas);
+  });
+
   socket.on('entrar_sala', (dados) => {
     const { sala, username } = dados;
-    socket.join(sala);
+    if(!salas[sala]) {
+      socket.emit('erro', "Sala não encontrada");
+      return;
+    }
+    if(salas[sala].jogadores[username]) {
+      socket.emit('erro', "Você já está na sala");
+      return;
+    }
     
-    // Avisa apenas os usuários DENTRO da sala que alguém entrou
-    // [PREENCHA AQUI: Use io.to().emit() para enviar o evento 'mensagem_chat' para a sala]
+    socket.join(sala);
+
+    if (Object.keys(salas[sala].jogadores).length === 0) {
+      salas[sala].dono = username;
+      console.log("Novo dono da sala:", salas[sala].dono);
+    }
+    
+    salas[sala].jogadores[username] = socket.id;
+    
+    io.to(sala).except(socket.id).emit('mensagem_recebida', { quemMandou : "Servidor", mensagem : `${username} entrou na sala.` });
+    
+    io.to(sala).emit('atualizar_sala', salas[sala]);
+    io.emit('atualizar-lista-salas', salas);
+  });
+
+  socket.on('disconnect', () => {
+    Object.keys(salas).forEach(id => {
+      const sala = salas[id];
+
+      const username = Object.keys(sala.jogadores).find(
+        (user) => sala.jogadores[user] === socket.id
+      );
+
+      if(username) {
+        delete sala.jogadores[username];
+
+        if(Object.keys(sala.jogadores).length === 0) {
+          delete salas[id];
+          io.emit('atualizar-lista-salas', salas);
+          console.log("apagando sala " + id);
+          return;
+        }
+
+        if(sala.dono === username) {
+          sala.dono = Object.keys(sala.jogadores)[0];
+        }
+        
+        console.log(sala);
+
+        io.to(id).emit('atualizar_sala', sala);
+        io.emit('atualizar-lista-salas', salas);
+      }
+    });
   });
 
   socket.on('sortear_letra', (sala) => {
     const alfabeto = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const letraSorteada = alfabeto[Math.floor(Math.random() * alfabeto.length)];
     
-    // Dispara a letra para todos da sala
     io.to(sala).emit('letra_sorteada', letraSorteada);
   });
 
-  // DESAFIO 3: O Botão STOP!
   socket.on('gritar_stop', (dados) => {
     const { sala, username } = dados;
-    // O evento abaixo deve avisar todos na sala para travarem seus inputs e enviarem as respostas.
-    // [PREENCHA AQUI: Emita o evento 'fim_de_rodada' contendo o nome de quem gritou STOP]
+    io.to(sala).emit('fim_de_rodada', username);
   });
 });
 

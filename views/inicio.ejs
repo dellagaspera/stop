@@ -2,27 +2,99 @@
 
 <div class="container">
     <h1>Salas</h1>
-    <div id="lista-salas" class="lista-salas">
-        <% const idsSalas = Object.keys(salas); %>
-        <% if(idsSalas.length > 0) { %>
-            <% idsSalas.forEach(function(id) { %>
-                <% const sala = salas[id]; %>
-                <div class="card-sala">
-                    <span class="id-sala">#<%= sala.id %></span>
-                    <a class="button" href="/jogo/<%= sala.id %>">entrar</a>
-                    <span class="jogadores-sala"> <%= sala.jogadores.length %> <span class="material-symbols-outlined">person</span></span>
-                </div>
-            <% }); %>
-        <% } else { %>
-            <span>nenhuma sala encontrada</span>
-        <% }%>
+    <div class="container-inner">
+        <form id="form-acessar-sala" class="container-inner">
+            <h2>Acessar Sala</h2>
+            <label>
+                ID da sala
+                <input id="input-sala" class="input-alt" name="sala" type="text" required>
+            </label>
+            <button class="button-alt" type="submit">entrar</button>
+        </form>
+        
+        <div id="lista-salas" class="lista-salas"></div>
+
         <a class="button-alt" href="/criar-sala">criar sala</a>
     </div>
 </div>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
 const listaSalas = document.getElementById("lista-salas");
 const criarSala = document.getElementById("criar-sala");
+
+const socket = io();
+
+let salas = {};
+
+socket.emit('solicitar-lista-salas');
+
+socket.on('atualizar-lista-salas', (listaSalasAtualizada) => {
+    salas = listaSalasAtualizada;
+    console.log("recebi atualizacao"); 
+    console.log(salas); 
+
+    atualizarLista();
+});
+
+function atualizarLista() {
+    listaSalas.innerHTML = "";
+
+    const idsSalas = Object.keys(salas);
+    if(idsSalas.length === 0) {
+        let span = document.createElement("span");
+        span.textContent = "nenhuma sala encontrada";
+        span.style.textAlign = "center";
+        listaSalas.appendChild(span);
+    } else {
+        idsSalas.forEach(function(id) {
+            sala = salas[id];
+
+            let div = document.createElement("div");
+            div.classList.add("card-sala");
+            
+            let spanId = document.createElement("span");
+            spanId.classList.add("id-sala");
+            spanId.textContent = "#" + id;
+            div.appendChild(spanId);
+            
+            let a = document.createElement("a");
+            a.classList.add("button");
+            a.href = "/jogo/" + id;
+            a.textContent = "entrar";
+            div.appendChild(a);
+
+            let spanJogadores = document.createElement("span");
+            spanJogadores.classList.add("jogadores-sala");
+            spanJogadores.textContent = Object.keys(sala.jogadores).length;
+
+            let spanIcone = document.createElement("span");
+            spanIcone.classList.add("material-symbols-outlined");
+            spanIcone.textContent = "person";
+            spanJogadores.appendChild(spanIcone);
+
+            div.appendChild(spanJogadores);
+
+            listaSalas.appendChild(div);
+        });
+    }
+}
+
+atualizarLista();
+
+const formAcessarSala = document.getElementById("form-acessar-sala");
+const inputSala = document.getElementById("input-sala");
+
+formAcessarSala.addEventListener("submit", function(event) {
+    event.preventDefault(); 
+    
+    const codigoSala = inputSala.value.trim(); 
+    
+    if (codigoSala) {
+        window.location.href = "/jogo/" + codigoSala;
+    }
+});
+
 </script>
 
 <%- include('partials/footer') %>

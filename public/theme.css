@@ -1,10 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap&family=Ranchers&display=swap&family=Bagel+Fat+One&display=swap&family=Oi&display=swap&display=swap&family=Erica+One&display=swap');
 
 :root {
     --accent: #fac425;
     --accent-alt: #ee9a1d;
+
+    --erro-background: #140b0d;
+    --erro: #2c1314;
+
     --background: #1d191f;
-    --background-alt: #151216;
+    --background-light: #262129;
+    --background-dark: #151216;
+    --background-darker: #100e11;
     --text: #e8e4f7;
 }
 
@@ -41,9 +47,11 @@ html, body {
   flex-direction: row;
 
   justify-content: space-between;
+  align-items: center;
 
-  background-color: var(--background-alt);
-  padding: 16px;
+  background-color: var(--background-dark);
+  /* padding: 16px; */
+  height: 64px;
   display: flex;
   gap: 24px;
 
@@ -52,8 +60,13 @@ html, body {
 }
 
 .footer {
-  background-color: var(--background-alt);
-  padding: 16px;
+  display: flex;
+  flex-direction: row;
+
+  background-color: var(--background-dark);
+  align-items: center;
+  /* padding: 16px; */
+  height: 64px;
   display: flex;
   gap: 24px;
 
@@ -88,7 +101,8 @@ html, body {
   padding-left: 64px;
   padding-right: 64px;
   background-color: var(--background);
-  border: 4px solid var(--background-alt);
+  border: 4px solid var(--background-dark);
+  text-align: center;
 
   border-radius: 16px;
 
@@ -102,7 +116,7 @@ html, body {
 }
 
 .button-alt {
-  background-color: var(--background-alt);
+  background-color: var(--background-dark);
   border-color: var(--background);
 }
 
@@ -125,7 +139,7 @@ html, body {
   margin-top: 32px;
   margin-bottom: 32px;
 
-  background-color: var(--background-alt);
+  background-color: var(--background-dark);
   border-radius: 16px;
 
   padding: 32px;
@@ -137,12 +151,26 @@ html, body {
   justify-items: center;
   align-content: center;
 
-  background-color: var(--background-alt);
+  background-color: var(--background-dark);
   border-radius: 16px;
 
   border: 4px solid var(--background);
 
-  padding: 16px;
+  padding: 32px;
+}
+
+.container-erro {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-content: center;
+
+  background-color: var(--erro-background);
+  border-radius: 16px;
+
+  border: 4px solid var(--erro);
+
+  padding: 32px;
 }
 
 h1, h2, p {
@@ -173,13 +201,34 @@ input {
   padding-left: 64px;
   padding-right: 64px;
   background-color: var(--background);
-  border: 2px solid var(--background-alt);
+  border: 4px solid var(--background-dark);
 
   border-radius: 16px;
 
   font-size: large;
   font-family: 'Outfit';
   color: var(--text);
+
+  transition: 0.3s;
+}
+
+input:focus {
+  border: 4px solid var(--accent);
+}
+
+.input-alt {
+  background-color: var(--background-dark);
+  border: 4px solid var(--background);
+
+  border-radius: 16px;
+
+  font-size: large;
+  font-family: 'Outfit';
+  color: var(--text);
+}
+
+.input-alt:focus {
+  border: 4px solid var(--accent);
 }
 
 .lista-salas {
@@ -189,16 +238,12 @@ input {
   justify-content: center;
   justify-self: center;
 
-  margin: 16px;
-  padding: 32px;
-  border-radius: 8px;
+  width: calc(640px);
 
-  background-color: var(--background-alt);
-  border: 4px solid var(--background);
-
-  min-width: calc(640px + 64px);
-
-  gap: 32px;
+  margin-bottom: 32px;
+  margin-top: 32px;
+  padding: 0;
+  gap: 16px;
 }
 
 .card-sala {
@@ -241,10 +286,10 @@ input {
 
   border-bottom-left-radius: 8px;
 
-  background-color: var(--accent);
-  color: black;
+  background-color: var(--background-light);
+  color: var(--text);
 
-  font-size: medium;
+  font-size: large;
   font-weight: bold;
 }
 
@@ -263,8 +308,8 @@ input {
 
   border-bottom-right-radius: 8px;
 
-  background-color: var(--accent);
-  color: black;
+  background-color: var(--background-light);
+  color: var(--text);
 
   font-size: medium;
   font-weight: bold;
@@ -277,10 +322,59 @@ input {
   height: 100%;
 }
 
+.lista-jogador {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+
+  gap: 4px;
+}
+
+.chat {
+  background-color: var(--background-darker);
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* 1. Define a largura da barra de rolagem */
+.chat::-webkit-scrollbar {
+  width: 10px;               /* Largura da barra vertical */
+  height: 10px;              /* Altura da barra horizontal (se houver) */
+}
+
+/* 2. O fundo da barra (a "pista" por onde o botão corre) */
+.chat::-webkit-scrollbar-track {
+  background: var(--background-darker); /* Mantém o fundo escuro do chat */
+  border-radius: 8px;
+}
+
+/* 3. O botão que o usuário arrasta (o "polegar" da barra) */
+.chat::-webkit-scrollbar-thumb {
+  background-color: var(--background-light); /* Cor base do botão */
+  border: 2px solid var(--background-darker); /* Cria um espaçamento elegante */
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+/* 4. Efeito de Hover para destacar quando o usuário passa o mouse */
+.chat::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent); /* Muda para a cor amarela de destaque */
+}
+
 .material-symbols-outlined {
   font-variation-settings:
-  'FILL' 0,
+  'FILL' 1,
   'wght' 400,
   'GRAD' 0,
-  'opsz' 24
+  'opsz' 24;
+}
+
+.stop-logo {
+  display: flex;
+  /* font-family: 'Ranchers'; */
+  font-family: 'Bagel Fat One';
+  /* font-family: 'Oi'; */
+  /* font-family: 'Erica One'; */
+  font-size: x-large;
 }

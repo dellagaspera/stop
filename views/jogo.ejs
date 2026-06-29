@@ -1,13 +1,10 @@
 <%- include('partials/header') %>
 
 <script src="/socket.io/socket.io.js"></script>
-<div class="container" style="flex-direction: row; gap: 32px;">
+<div id="tela-jogo" class="container" style="flex-direction: row; gap: 32px;">
   <div class="container-inner" style="min-width: 360px;">
     <h2>Jogadores</h2>
-    <div class="container-inner lista-jogadores">
-      <% sala.jogadores.forEach(function(jogador) { %>
-        <span class=""><%= jogador %></span>
-      <% }); %>
+    <div id="lista-jogadores" class="container-inner lista-jogadores">
     </div>
   </div>
   <div class="container-inner">
@@ -29,16 +26,49 @@
   </div>
 
   <div class="container-inner" style="min-width: 360px;">
+  <div class="container-inner chat" style="min-width: 360px;">
     <h2>Chat</h2>
+    <div id="chat">
+    </div>
+    
+    <form id="form-chat">
+      <input type="text">
+    </form>
+  </div>
   </div>
 
   <script>
+    // if(sala.jogadores[])
+
     const socket = io();
     const username = "<%= username %>";
-    const sala = "<%= sala %>";
+
+    const telaJogo = document.getElementById("tela-jogo");
+
+    const listaJogadores = document.getElementById("lista-jogadores");
+    let dono;
+    
+    const chat = document.getElementById("chat");
 
     // Entra na sala
-    socket.emit('entrar_sala', { sala, username });
+    socket.emit('entrar_sala', { sala : "<%= sala.id %>", username });
+
+    socket.on('erro', (mensagem) => {
+      telaJogo.innerHTML = "";
+      telaJogo.classList.add("container-erro");
+
+      telaJogo.style.flexDirection = "column";
+
+      console.log("erro: " + mensagem);
+
+      let tituloErro = document.createElement("h1");
+      tituloErro.textContent = "Erro";
+      telaJogo.appendChild(tituloErro);
+
+      let mensagemErro = document.createElement("span");
+      mensagemErro.textContent = mensagem;
+      telaJogo.appendChild(mensagemErro);
+    });
 
     // Apenas o primeiro jogador pode iniciar, mas para simplificar, colocaremos um botão depois.
     // Recebendo a letra sorteada
@@ -48,9 +78,37 @@
       // [PREENCHA AQUI: Lógica em JavaScript puro para remover o atributo 'disabled']
     });
 
+    socket.on('atualizar_sala', (salaAtualizada) => {
+      sala = salaAtualizada;
+      dono = sala.dono;
+
+      listaJogadores.innerHTML = '';
+      
+      const jogadores = Object.keys(sala.jogadores); 
+
+      jogadores.forEach(function(jogador) { 
+        let divJogador = document.createElement("div");
+        divJogador.classList.add("lista-jogador");
+        if(jogador === dono) {
+          let spanCoroa = document.createElement("span");
+          spanCoroa.classList.add("material-symbols-outlined");
+          spanCoroa.textContent = "crown";
+          spanCoroa.style.alignSelf = "center";
+          spanCoroa.style.color = "var(--accent)";
+          spanCoroa.style.fontSize = "16px";
+          divJogador.appendChild(spanCoroa);
+        }
+        let spanJogador = document.createElement("span");
+        spanJogador.textContent = jogador;
+        divJogador.appendChild(spanJogador);
+
+        listaJogadores.appendChild(divJogador);
+      }); 
+    });
+
     // Ao clicar em STOP
     document.getElementById('btn-stop').addEventListener('click', () => {
-      socket.emit('gritar_stop', { sala, username });
+      socket.emit('gritar_stop', { salaId, username });
     });
 
     // Quando alguém aperta STOP
@@ -58,6 +116,25 @@
       alert(`O jogador ${quemGritou} gritou STOP! Lápis na mesa!`);
       // DESAFIO 5: Desabilite os campos novamente e colete os valores digitados para enviar ao servidor.
       // [PREENCHA AQUI]
+    });
+  
+    socket.on('mensagem_recebida', (dados) => {
+      const quemMandou = dados.quemMandou;
+      const mensagem = dados.mensagem;
+
+      console.log("recebi mensagem: \n" + `${quemMandou}: ${mensagem}`);
+
+      let divMensagem = document.createElement("div");
+
+      let spanPessoa= document.createElement("span")
+      spanPessoa.textContent = quemMandou;
+      let spanMensagem= document.createElement("span")
+      spanMensagem.textContent = mensagem;
+
+      divMensagem.appendChild(spanPessoa);
+      divMensagem.appendChild(spanMensagem);
+
+      chat.appendChild(divMensagem);
     });
   </script>
 </div>

@@ -9,45 +9,29 @@
         </label>
         <label>
             senha
-            <input id="password" name="password" type="text">
-        </label>
-        <div style="padding-top: 16px; gap: 32px; display: flex; flex-direction: row; justify-content: center; align-items: center">
-            <button class="button" type="submit">login</button>
-            <button class="a" type="button" onclick="trocarFormulario()">não tenho uma conta</button>
-        </div>
-    </form>
-    <form id="formulario-sigin" method="post" action="/cadastro" class="container-inner">
-        <h1>Cadastrar</h1>
-        <label>
-            usuário
-            <input id="username" name="username" type="text">
-        </label>
-        <label>
-            senha
             <input id="password" name="password" type="password">
         </label>
         <div style="padding-top: 16px; gap: 32px; display: flex; flex-direction: row; justify-content: center; align-items: center">
-            <button class="button" type="submit">criar conta</button>
-            <button class="a" type="button" onclick="trocarFormulario()">já tenho uma conta</button>
+            <button class="button" type="submit">login</button>
+            <button id="botao-trocar" class="a" type="button" onclick="trocarFormulario()">não tenho uma conta</button>
         </div>
     </form>
 </div>
 
 <script>
 const formLogin = document.getElementById("formulario-login");
-const formSigin = document.getElementById("formulario-sigin");
-formSigin.style.display = "none";
+const botaoTrocar = document.getElementById("botao-trocar");
 
 estado = "login";
 function trocarFormulario() {
     if(estado === "login") {
         estado = "cadastro";
-        formLogin.style.display = "none";
-        formSigin.style.display = "flex";
+        formLogin.action = "/cadastro";
+        botaoTrocar.textContent = "já tenho uma conta"
     } else {
         estado = "login";
-        formSigin.style.display = "none";
-        formLogin.style.display = "flex";
+        formLogin.action = "/login";
+        botaoTrocar.textContent = "não tenho uma conta"
     }
 }
 </script>
